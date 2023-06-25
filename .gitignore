@@ -1,0 +1,15 @@
+*.pyc
+/DoE-exercises/temp_files
+__pycache__
+.ipynb_checkpoints
+.idea
+/benchmark_2_example/figures
+/benchmark_2_example/temp_files
+/benchmark_2_example/*.h5
+/benchmark_2_example/*.log
+/benchmark_2_example/resources/power/power_grid_model_*.json
+/DoE-exercises
+/guidelines_examples/*.hdf5
+/benchmark_2_example/temp_files_sobol_indices_designparams/*.h5
+/output
+/guidelines_examples/figures

@@ -1,0 +1,11 @@
+{
+    "House": {
+        "attrs": {
+            "P": {
+                "utype": "PBox",
+                "function": "data/house_error.py"
+            }
+        },
+        "params": {}
+    }
+}

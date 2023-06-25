@@ -1,0 +1,22 @@
+{
+    "Grid": {
+        "attrs": {},
+        "params": {}
+    },
+    "RefBus": {
+        "attrs": {},
+        "params": {}
+    },
+    "PQBus": {
+        "attrs": {},
+        "params": {}
+    },
+    "Transformer": {
+        "attrs": {},
+        "params": {}
+    },
+    "Branch": {
+        "attrs": {},
+        "params": {}
+    }
+}

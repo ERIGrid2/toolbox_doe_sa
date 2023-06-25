@@ -1,0 +1,12 @@
+{
+    "Sun": {
+        "attrs": {
+            "DNI": {
+                "utype": "Interval",
+                "function": "data/sun_error.py",
+                "kwargs": ["start_date", "datafile"]
+            }
+        },
+        "params": {}
+    }
+}

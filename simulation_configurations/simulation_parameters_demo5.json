@@ -1,0 +1,50 @@
+{
+    "samples": 4,
+    "add_extreme_points": true,
+    "doe_type": "distribution_and_discrete",
+    "parallelize": true,
+    "num_processes": 8,
+    "skip_simulation": true,
+    "drop_first_day_data": false,
+    "plots": false,
+    "show_plots": false,
+    "dpi": 300,
+    "format": "png",
+    "folder_figures": "output\\figures_demo5",
+    "basic_conf": {
+        "ID": "00",
+        "scenario_name": "demo5",
+        "folder_temp_files": "output\\temp_files_demo5",
+        "summary_filename": "runs_summary_demo5",
+        "end": 172800,
+        "step_size": 60
+    },
+    "target_metrics": [],
+    "variations_dict": {
+        "communication":{
+            "delay": {
+                "type": "norm",
+                "mean": 15.0,
+                "stdvs": 2.0
+            }
+        },
+        "grid": {
+            "load_step": {
+                "type": "discrete",
+                "set": [
+                  50.0,
+                  100.0,
+                  200.0
+                ]
+            }
+        }
+    },
+    "entities_parameters":{
+        "communication":{
+            "delay": 15.0
+        },
+        "grid": {
+            "load_step": 100.0
+        }
+    }
+}

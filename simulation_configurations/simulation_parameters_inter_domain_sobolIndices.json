@@ -1,0 +1,115 @@
+{
+    "samples": 16,
+    "add_extreme_points": true,
+    "doe_type": "sobol",
+    "doe_type_alternatives": [
+        "sobol_indices",
+        "sobol",
+        "LHS",
+        "extreme_points"
+    ],
+    "parallelize": true,
+    "num_processes": 8,
+    "skip_simulation": false,
+    "drop_first_day_data": true,
+    "plots": false,
+    "show_plots": false,
+    "dpi": 300,
+    "format": "png",
+    "folder_figures": "output\\figures",
+    "basic_conf": {
+        "ID": "00",
+        "scenario_name": "tank_scaling",
+        "folder_temp_files": "output\\temp_files",
+        "summary_filename": "runs_summary",
+        "end": 604800,
+        "step_size": 60,
+        "stochastic": false,
+        "noise_scale": 0.05
+    },
+    "target_metrics": [
+        "grid_voltage_bus_2_max_pu",
+        "line_0_loading_max_perc",
+        "hp_electr_energy_gwh",
+        "hp_heat_energy_gwh",
+        "hp_average_COP",
+        "electricity_import_mwh",
+        "electricity_export_mwh",
+        "self_consumption_perc",
+        "t_supply_min",
+        "t_supply_max",
+        "heat_import_gwh",
+        "heat_import_perc",
+        "hp_perc"
+    ],
+    "variations_dict": {
+        "heat_profiles": {
+            "scale": [0.8, 1.2]
+        },
+        "voltage_ctrl": {
+            "hp_p_el_mw_min": [0.03, 0.05]
+        }
+    },
+    "entities_parameters":{
+        "consumer_load": {
+            "scale": 1.0
+        },
+        "heat_profiles": {
+            "scale": 1.0
+        },
+        "gen_pv": {
+            "scale": 1.0
+        },
+        "el_network": {
+            "grid_file": "benchmark_2_example\\resources\\power\\power_grid_model.json",
+            "line_0_length": 0.3,
+            "line_1_length": 0.3
+        },
+        "dh_network":{
+            "T_supply_grid": 75,
+            "P_grid_bar": 6,
+            "T_amb": 8,
+            "dynamic_temp_flow_enabled": false
+        },
+        "hex_consumer1":{
+            "T_return_target": 40,
+            "P_heat": 500,
+            "mdot_hex_in": 3.5,
+            "mdot_hex_out": -3.5
+        },
+        "hex_consumer2":{
+            "T_return_target": 40,
+            "P_heat": 500,
+            "mdot_hex_in": 3.5,
+            "mdot_hex_out": -3.5
+        },
+        "storage_tank":{
+            "INNER_HEIGHT": 7.9,
+            "INNER_DIAMETER": 3.72,
+            "INSULATION_THICKNESS": 0.1,
+            "STEEL_THICKNESS": 0.02,
+            "NB_LAYERS": 10,
+            "T_volume_initial": 60
+        },
+        "heat_pump":{
+            "P_rated": 100.0,
+            "lambda_comp": 0.2,
+            "P_0": 0.3,
+            "eta_sys": 0.5,
+            "eta_comp": 0.7,
+            "T_evap_out_min": 20,
+            "T_cond_out_target": 75,
+            "opmode": "constant_T_out"
+        },
+        "voltage_ctrl":{
+            "enabled": 1,
+            "delta_vm_upper_pu": 0.1,
+            "delta_vm_lower_pu_hp_on": -0.1,
+            "delta_vm_lower_pu_hp_off": -0.08,
+            "delta_vm_deadband": 0.03,
+            "hp_p_el_mw_rated": 0.1,
+            "hp_p_el_mw_min": 0.04,
+            "k_p": 0.15
+        }
+    }    
+}

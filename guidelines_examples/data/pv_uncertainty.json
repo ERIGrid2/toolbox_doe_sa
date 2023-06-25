@@ -1,0 +1,28 @@
+{
+    "PV": {
+        "attrs": {},
+        "params": {
+            "area": {
+                "utype": "Interval",
+                "data": {
+                    "minimum": 4.0,
+                    "maximum": 8.0
+                }
+            },
+            "efficiency": {
+                "utype": "Interval",
+                "data": {
+                    "minimum": 0.2,
+                    "maximum": 0.6
+                }
+            },
+            "el_tilt": {
+                "utype": "Interval",
+                "data": {
+                    "minimum": 30.0,
+                    "maximum": 35.0
+                }
+            }
+        }
+    }
+}
