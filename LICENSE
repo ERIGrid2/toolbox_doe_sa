@@ -19,3 +19,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+
+Part of the code is based on ERIGrid/NA4-SummerSchool-DTU-2018: v2.0 (https://zenodo.org/record/2837928) 
+Copyright (c) 2019 - Tue Vissing Jensen, on behalf of Technical University of Denmark, 
+Department of Electrical Engineering
+
+
+
+The folder benchmark_2_example is based on the Benchmark Model Multi-Energy Networks
+(https://github.com/ERIGrid2/benchmark-model-multi-energy-networks) and licensed unter BSD 3-Clause License
+
+Copyright (c) 2023, ERIGrid 2.0
+All rights reserved.
