@@ -3,9 +3,9 @@
 This repository contains a toolbox wit Design of Experiment (DoE) and Sensitivity Analysis (SA) methods
 developed in the [ERIGrid 2.0] project.
 As example scenario for the usage of the toolbox, a multi-energy networks benchmark model, which was also developed
-in the [ERIGrid 2.0] project, is used (see folder 'benchmark_2_examples').
+in the [ERIGrid 2.0] project, is used (see folder [```benchmark_2_example```](./benchmark_2_example)).
 Additionally, some basic example scenarios for DoE, SA and also Uncertainty Propagation methods are provided in the 
-'guidelines_examples' folder.
+[```guidelines_examples```](./guidelines_examples) folder.
 
 ## Toolbox
 The toolbox, is divided into two main scripts.
@@ -30,8 +30,7 @@ For the SA, code from an ERIGrid 1 summer school ist used (https://zenodo.org/re
 
 ## Multi-Energy Networks Example Scenario
 
-This example is based on the benchmark scenario, which is available at 
-https://github.com/ERIGrid2/benchmark-model-multi-energy-networks
+This example is based on the benchmark scenario, which is available at [GitHub](https://github.com/ERIGrid2/benchmark-model-multi-energy-networks).
 
 ### benchmark_multi_energy_sim
 Here, the mosaik co-simulation setup is stated. 
@@ -51,14 +50,12 @@ of the [ERIGrid 2.0] project.
 Some basic examples for DoE and SA methods.
 
 ### MoReSQUE examples
-Three examples scenarios for the MoReSQUE (https://gitlab.com/mosaik/tools/mosaik-moresque) Uncertainty Propagation 
+Three examples scenarios for the [MoReSQUE](https://gitlab.com/mosaik/tools/mosaik-moresque) Uncertainty Propagation 
 tool are shown.
 
 ## Funding acknowledgement
 
-<img alt="European Flag" src="https://erigrid2.eu/wp-content/uploads/2020/03/europa_flag_low.jpg" align="left" style="margin-right: 10px"/> 
-The development of [Toolbox with DoE and SA methods] has been supported by the [ERIGrid 2.0] project of the 
-H2020 Programme under [Grant Agreement No. 870620](https://cordis.europa.eu/project/id/870620)
+The development of [Toolbox with DoE and SA methods](https://github.com/ERIGrid2/toolbox_doe_sa) has been supported by the [ERIGrid 2.0] project of the 
+H2020 Programme under [Grant Agreement No. 870620](https://cordis.europa.eu/project/id/870620).
 
 [ERIGrid 2.0]: https://erigrid2.eu
-[Toolbox with DoE and SA methods]: https://github.com/ERIGrid2/toolbox_doe_sa
