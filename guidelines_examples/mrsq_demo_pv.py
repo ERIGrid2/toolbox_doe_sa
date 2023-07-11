@@ -1,3 +1,5 @@
+import os
+
 import mosaik
 import moresque.ensembles as eam
 
@@ -92,6 +94,8 @@ def create_scenario(world):
 
     # Create database::
     db = world.start('DB', step_size=60, duration=END)
+    if not os.path.isdir('results'):
+        os.mkdir('results')
     hdf5 = db.Database(filename='results\\pv_uncertainty_study.hdf5')
     # Connect aggregation modules to database:
     world.connect(pv_agg, hdf5, 'P_minA', 'P_maxA')

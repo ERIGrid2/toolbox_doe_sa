@@ -4,6 +4,7 @@ matplotlib
 mosaik
 mosaik-csv
 mosaik-hdf5
+MoReSQUE
 mosaik-pv
 mosaik-pypower
 numpy

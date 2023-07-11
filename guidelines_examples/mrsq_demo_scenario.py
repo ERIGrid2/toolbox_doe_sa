@@ -3,8 +3,6 @@ import copy
 import mosaik
 import moresque.ensembles as eam
 
-import execution_graph_tools as util
-
 # Component initialization commands:
 sim_config = {
     'PyPower': {
