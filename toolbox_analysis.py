@@ -11,7 +11,7 @@ import statistics
 from SALib.analyze import sobol, fast
 from pandas import DataFrame
 
-import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
+# import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
 import toolbox_start as benchmark_sa
 
 
@@ -308,7 +308,7 @@ def analyze_results(recipes, variations_dict, basic_conf, folder='figures', form
             logger.info(f'Do sobol indices analysis for target metric {target_metric}:')
             try:
                 results_array = results[[target_metric]].iloc[:, 0].to_numpy()
-                logger.info(f'Reults_array: {results_array}')
+                logger.info(f'Results_array: {results_array}')
                 if doe_type == 'sobol_indices':
                     si = sobol.analyze(problem,
                                        results_array,

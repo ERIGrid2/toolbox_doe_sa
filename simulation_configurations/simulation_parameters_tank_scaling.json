@@ -10,7 +10,7 @@
     ],
     "parallelize": true,
     "num_processes": 8,
-    "skip_simulation": false,
+    "skip_simulation": true,
     "drop_first_day_data": true,
     "plots": false,
     "show_plots": false,
@@ -20,7 +20,7 @@
     "basic_conf": {
         "ID": "00",
         "scenario_name": "tank_scaling",
-        "folder_temp_files": "output\\temp_files",
+        "folder_temp_files": "output\\temp_files_tank_scaling",
         "summary_filename": "runs_summary",
         "end": 604800,
         "step_size": 60,

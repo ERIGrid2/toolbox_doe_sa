@@ -127,7 +127,7 @@ FIG_TYPE = 'png' # 'pdf'
 FIG_SIZE = [15, 8]
 
 
-def data_processing(recipe, variations, folder_temp_files, summary_filename, drop_first_day_data=True):
+def  data_processing(recipe, variations, folder_temp_files, summary_filename, drop_first_day_data=True):
     # # Data processing
     sim_results = {}
     results_store = pd.HDFStore(benchmark_sim.get_store_filename(recipe))

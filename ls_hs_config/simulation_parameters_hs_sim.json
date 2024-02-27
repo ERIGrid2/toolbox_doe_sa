@@ -1,0 +1,107 @@
+{
+    "samples": 32,
+    "add_extreme_points": true,
+    "doe_type": "sobol",
+    "doe_type_alternatives": [
+      "distribution_and_discrete",
+      "LHS",
+      "extreme_points",
+      "OAT",
+        "sobol",
+        "sobol_indices"
+    ],
+    "parallelize": true,
+    "num_processes": 8,
+    "skip_simulation": true,
+    "drop_first_day_data": false,
+    "plots": false,
+    "show_plots": false,
+    "dpi": 300,
+    "format": "png",
+    "folder_figures": "output\\figures_ls_hs_trial",
+    "basic_conf": {
+        "ID": "00",
+        "scenario_name": "sim_characterization",
+        "folder_temp_files": "output\\temp_files_ls_hs_trial",
+        "summary_filename": "runs_summary_hs_sim",
+        "end": 3600,
+        "step_size": 1
+    },
+    "target_metrics": [
+         "Losses_hess",
+         "Losses_li",
+         "Losses_sc",
+         "Losses_vrb",
+         "Degradation_li"
+    ],
+    "target_metrics_available": [
+        "Cycle_counts_li",
+         "Cycle_counts_sc",
+         "Cycle_counts_vrb",
+         "E_cap_hess_utilization",
+         "E_cap_li_utilization",
+         "E_cap_sc_utilization",
+         "E_cap_vrb_utilization",
+         "Losses_hess",
+         "Losses_li",
+         "Losses_sc",
+         "Losses_vrb",
+         "MAPE_hess",
+         "MAPE_li",
+         "MAPE_sc",
+         "MAPE_vrb",
+         "Normal_op_fraction_hess",
+         "P_cap_hess_utilization",
+         "P_cap_li_utilization",
+         "P_cap_sc_utilization",
+         "P_cap_vrb_utilization",
+         "RMSE_hess",
+         "RMSE_li",
+         "RMSE_sc",
+         "RMSE_vrb",
+         "RT_Efficiency_hess",
+         "RT_Efficiency_li",
+         "RT_Efficiency_sc",
+         "RT_Efficiency_vrb"
+    ],
+    "variations_dict": {
+        "Framework": {
+            "power_scaling_factor": [0.5,1.5]
+        },
+        "Controller":{
+            "p_sc_max": [0.0,15.0],
+            "restoration_factor": [2,4]
+        }
+    },
+    "variations_dict_alternatives": {
+        "Controller":{
+            "p_li_max": [0.0,15.0],
+            "p_vrb_max": [0.0,15.0],
+            "VRB_min_cap_fraction": [0.3,0.7],
+            "restoration_factor": [2,4]
+        }
+    },
+    "entities_parameters":{
+        "Framework": {
+            "power_scaling_factor": 1.0
+        },
+        "Controller":{
+            "VRB_min_cap_fraction": 0.5,
+             "restoration_factor": 2,
+            "p_vrb_max":7.5,
+            "p_sc_max": 7.5,
+            "p_li_max": 7.5
+        },
+        "Vanadium_Battery":{
+            "Actual_Capacity": 150,
+            "Available_Capacity": 30,
+            "Actual_Power": 48,
+            "Available_Power": 15,
+            "Initial_SOC": 50,
+            "Maximum_SOC": 95,
+            "Minimum_SOC": 5,
+            "Simulated": true,
+            "Implementation": "simulators.VanadiumBattery"
+        }
+    }
+}

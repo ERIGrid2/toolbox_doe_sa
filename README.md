@@ -13,7 +13,7 @@ The toolbox, is divided into two main scripts.
 ### toolbox_start
 This is the script to be run where the input parameters (JSON file) are read, and the functions related to the 
 scenario simulations, statistical analysis and plotting are called. 
-The code start by reading the folder path hat contains the JSON with the simulation parameters.
+The code starts by reading the folder path hat contains the JSON with the simulation parameters.
 
 In the JSON file, the value for each simulation parameter (e.g., scenario name, step size, sobol samples, etc.) is 
 specified individually. 

@@ -17,9 +17,9 @@ from loguru import logger
 from SALib import ProblemSpec
 from SALib.sample import sobol, fast_sampler, latin
 
-import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
-import benchmark_2_example.benchmark_multi_energy_analysis as benchmark_analysis
-import toolbox_analysis
+#import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
+#import benchmark_2_example.benchmark_multi_energy_analysis as benchmark_analysis
+#import toolbox_analysis
 
 logger.remove()
 logger.add("results.log", level="DEBUG")
@@ -62,7 +62,7 @@ def get_variations_distribution(variations_dict):
                 means.append(factor_value['mean'])
                 stdvs.append(factor_value['stdvs'])
             else:
-                logger.warning(f'Please specifiy mean and stdvs for {entity} - {factor}')
+                logger.warning(f'Please specify mean and stdvs for {entity} - {factor}')
     return means, stdvs
 
 
@@ -120,10 +120,10 @@ def create_problem(variations_dict):
 
 
 if __name__ == '__main__':
-    config_folder = 'simulation_configurations'
-    # config_folder = 'ls_hs_config'
+    # config_folder = 'simulation_configurations'
+    config_folder = 'ls_hs_config'
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters.json')
+    sim_parameters = read_in_sim_parameters(os.path.join(config_folder,'simulation_parameters_hs_sim.json'))
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_oat.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_designparams.json')
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_scenarioparams.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_sobolIndices.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_demo5.json')
-    sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling.json')
+    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_pv.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_heat.json')
     # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_lines.json')
@@ -161,9 +161,11 @@ if __name__ == '__main__':
             samples = sampler.random_base2(m=int(m_log))
         else:
             # calculate the number of samples based on 2**m
-            logger.warning(f"Note: unbalanced design is requested since number of samples is not a power of 2: samples requested:{sim_parameters['samples']} {2**m_log}, samples used {2**(int(m_log) + 1)};  missing samples: {2**(int(m_log) + 1) - sim_parameters['samples']}")
+            logger.warning(f"Note: unbalanced design requested since number of samples is not a power of 2: \n"
+                           f"samples requested:{sim_parameters['samples']} {2**m_log}, samples used \
+                            {2**(int(m_log) + 1)};  missing samples: {2**(int(m_log) + 1) - sim_parameters['samples']}")
             samples = sampler.random_base2(m=int(m_log)+1)
-            samples = sobol_seq.i4_sobol_generate(num_factors, sim_parameters['samples'])
+            # samples = sobol_seq.i4_sobol_generate(num_factors, sim_parameters['samples'])
 
         if sim_parameters['add_extreme_points']:
             # SOBOL index includes 0 extreme point, so only add "1"
@@ -304,10 +306,10 @@ if __name__ == '__main__':
 
     #store recipes to file for analysis
     with open(f"{folder_temp_files}/recipes.json", "w") as write_file:
-        json.dump(recipes, write_file)
+        json.dump(recipes, write_file, indent="    ")
     #store variations to file for analysis
     with open(f"{folder_temp_files}/variations.json", "w") as write_file:
-        json.dump(variations, write_file)
+        json.dump(variations, write_file, indent="    ")
 
     logger.info('')
     # logger.info(f'Start simulation with simulation time of {end} seconds')
@@ -317,6 +319,8 @@ if __name__ == '__main__':
     # logger.info(f"variations_dict: {variations_dict}")
     logger.info(f"number of planned simulation runs: {len(recipes)}")
 
+
+'''
     if sim_parameters['parallelize']:
         if sim_parameters['skip_simulation']:
             logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
@@ -360,3 +364,4 @@ if __name__ == '__main__':
                                        scenario_name=basic_conf['scenario_name'],
                                        plt_show=sim_parameters['show_plots'])
     # benchmark_analysis.plot_simulation_results(sim_parameters)
+'''

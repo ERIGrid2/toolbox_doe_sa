@@ -1,16 +1,11 @@
 {
-    "samples": 20,
+    "samples": 4,
     "add_extreme_points": true,
-    "doe_type": "sobol",
-    "doe_type_alternatives": [
-        "sobol_indices",
-        "fast",
-        "sobol",
-        "LHS",
-        "extreme_points",
-        "OAT"
-    ],
-    "parallelize": false,
+    "doe_type": "sobol_indices",
+    "doe_type_alternatives": "sobol",
+    "doe_type_alternatives": "LHS",
+    "doe_type_alternatives": "extreme_points",
+    "parallelize": true,
     "num_processes": 8,
     "skip_simulation": false,
     "drop_first_day_data": true,
@@ -18,38 +13,59 @@
     "show_plots": false,
     "dpi": 300,
     "format": "png",
-    "folder_figures": "output\\figures_sobol_designparams_metamodel",
+    "folder_figures": "output\\figures",
     "basic_conf": {
         "ID": "00",
-        "scenario_name": "inter_domain_sobol_designparams_metamodel",
-        "folder_temp_files": "output\\temp_files_sobol_designparams_metamodel",
-        "summary_filename": "runs_summary_sobol_designparams_metamodel",
+        "scenario_name": "test_1",
+        "folder_temp_files": "output\\temp_files",
+        "summary_filename": "runs_summary",
         "end": 604800,
-        "end_2days": 172800,
-        "end_original": 604800,
         "step_size": 60,
         "stochastic": false,
         "noise_scale": 0.05
     },
     "target_metrics": [
-        "grid_voltage_bus_2_max_pu",
-        "line_0_loading_max_perc",
-        "hp_electr_energy_gwh",
-        "hp_heat_energy_gwh",
-        "hp_average_COP",
-        "electricity_import_mwh",
-        "electricity_export_mwh",
-        "self_consumption_perc",
-        "t_supply_min",
-        "heat_import_gwh",
-        "heat_import_perc"
+
+    ],
+    "target_metrics_not_used": [
+
     ],
     "variations_dict": {
         "storage_tank":{
-            "INNER_DIAMETER": [1.0, 4]
+            "INNER_DIAMETER": [
+                1,
+                8
+            ]
         },
-        "voltage_ctrl":{
-            "k_p": [0.1, 0.2]
+        "gen_pv": {
+            "scale": [
+                0.6,
+                1.4
+            ]
+        },
+        "el_network": {
+            "line_0_length": [
+                0.1,
+                0.6
+            ]
+        }
+    },
+    "variations_dict_bkp": {
+        "el_network": {
+            "line_0_length": {
+                "mean": 0.3,
+                "stdvs": 1
+            },
+            "line_0_length": [
+                0.1,
+                0.6
+            ]
+        },
+        "gen_pv": {
+            "scale": [
+                0.5,
+                1.5
+            ]
         }
     },
     "entities_parameters":{
