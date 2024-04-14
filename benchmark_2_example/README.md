@@ -8,6 +8,8 @@ Install all required Python packages with the following command:
 > python -m pip install -r requirements.txt
 ```
 
+If pandapipes fails to be installed with pip, it might be needed to install it from its [repository](https://github.com/e2nIEE/pandapipes).
+
 ## Running the benchmark simulations
 
 Run a benchmark simulation with **voltage control enabled** with the following command:
