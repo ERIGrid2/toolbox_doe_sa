@@ -129,8 +129,8 @@ def do_oat_analysis(results, variation_params, target_metric, folder_figures, sc
         results_df = results_df.append({'factor': factor, 'value': min}, ignore_index=True)
         results_df = results_df.append({'factor': factor, 'value': mean}, ignore_index=True)
         results_df = results_df.append({'factor': factor, 'value': max}, ignore_index=True)
-        logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with min {(min / mean * 100):.2f}%')
-        logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with max {(max / mean * 100):.2f}%')
+        # logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with min {(min / mean * 100):.2f}%')
+        # logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with max {(max / mean * 100):.2f}%')
         variances_df = variances_df.append({'factor': factor, 'variance': statistics.variance([min, mean, max])},
                                            ignore_index=True)
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -144,7 +144,7 @@ def do_oat_analysis(results, variation_params, target_metric, folder_figures, sc
                 format=format,
                 bbox_inches="tight")
     results_df.to_csv(f'{folder_figures}\\{scenario_name}_{target_metric}.csv')
-    logger.info(variances_df.sort_values(by=['variance']).to_markdown())
+    # logger.info(variances_df.sort_values(by=['variance']).to_markdown())
 
     return variances_df
 

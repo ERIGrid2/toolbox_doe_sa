@@ -25,6 +25,11 @@ These parameters set the values for the variables associated to the system model
 For instance, in the Multi-Energy Network model, the basic configuration parameters stand for hot water tank 
 dimensions (height, diameter), delta of control voltage for the heat pump and other set points.
 
+To run it with the multi-energy networks benchmark model, first the requirements have to be installed:
+```
+> pip install -r benchmark_2_example/requirements.txt
+```
+
 To run a simulation the script calls **_benchmark_sim.run_scenario(recipe)_**, which is the ME benchmark,
 but can be replaced by any other simulation scipt.
 

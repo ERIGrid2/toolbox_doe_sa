@@ -267,6 +267,7 @@ def data_processing(recipe, variations, folder_temp_files, summary_filename, dro
     # print(f"sim_data: {sim_data}")
     sim_data_df = pd.DataFrame(sim_data)
     sim_data_df.to_csv(f"{folder_temp_files}/{summary_filename}.csv")
+    sim_data_df.to_json(f"{folder_temp_files}/{summary_filename}.json")
     run_store = pd.HDFStore(f"{folder_temp_files}/{summary_filename}.h5")
     run_store['run_{}'.format(recipe['ID'])] = sim_data_df
     run_store.close()

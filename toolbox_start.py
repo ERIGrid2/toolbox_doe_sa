@@ -2,6 +2,8 @@ import copy
 
 import matplotlib.pyplot as plt
 import itertools
+from time import time, ctime
+from datetime import timedelta
 
 import pyDOE
 import sobol_seq
@@ -299,6 +301,8 @@ if __name__ == '__main__':
     logger.info(f"number of planned simulation runs: {len(recipes)}")
 
     if sim_parameters['parallelize']:
+        sim_start_time = time()
+        logger.info(f'start simulatino at {sim_start_time}')
         if sim_parameters['skip_simulation']:
             logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
                         "and only analysis script executed.")
@@ -306,6 +310,10 @@ if __name__ == '__main__':
             logger.info('Start parallel execution of scenarios')
             pool = mp.Pool(processes=sim_parameters['num_processes'])
             pool.map(benchmark_sim.run_scenario, list(recipes.values()))
+        sim_end = time()
+        sim_elapsed_time = str(timedelta(seconds=(sim_end - sim_start_time)))
+        logger.info('TOTAL ELAPSED TIME OF ALL SIMULATION RUNS:', sim_elapsed_time)
+        logger.info('TOTAL ELAPSED TIME OF ALL SIMULATION RUNS:', sim_end)
         for recipe_name in recipes:
             logger.info(f'Data processing scenario with recipe {recipe_name}: {recipes[recipe_name]}')
             benchmark_analysis.data_processing(recipes[recipe_name],

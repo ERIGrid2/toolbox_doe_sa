@@ -11,8 +11,6 @@ pandas==1.1.5
 pyDOE==0.3.8
 scipy==1.7.*
 simple-pid==1.0.1
-simpy==3.0.13
-mosaik-simpy-io==0.2.4
 SALib==1.4.7
 scikit-learn
 sobol_seq==0.2.*
