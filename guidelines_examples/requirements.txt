@@ -5,7 +5,7 @@ mosaik
 mosaik-csv
 mosaik-hdf5
 MoReSQUE
-mosaik-pv
+mosaik-pv==1.0
 mosaik-pypower
 numpy
 pandas
