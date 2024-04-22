@@ -1,7 +1,6 @@
 import random
 import os
 
-import mosaik_pv
 from SALib.sample import sobol_sequence, sobol, latin, morris, fast_sampler
 from SALib import ProblemSpec
 import matplotlib.pyplot as plt
@@ -9,7 +8,6 @@ import numpy as np
 from loguru import logger
 import statistics
 from SALib.analyze import fast as fast_analyzer
-from SALib.analyze import sobol as sobol_analyzer
 import pandas as pd
 import arrow
 from mosaik_pv.pvpanel import PVpanel
