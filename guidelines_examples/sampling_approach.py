@@ -234,9 +234,9 @@ def pv_example_3_factors(n):
 
 
 def pv_timeseries(n):
-    dni_timeseries = pd.read_csv('data\\dni_savannah_lat32_august.csv')
+    dni_timeseries = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'dni_savannah_lat32_august.csv'))
     dni_timeseries.set_index('Date', inplace=True)
-    error_timeseries = pd.read_csv('data\\error_savannah2_August.csv')
+    error_timeseries = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data','error_savannah2_August.csv'))
     error_timeseries.set_index('Date', inplace=True)
     dni_data = pd.concat([dni_timeseries, error_timeseries], axis=1)
     results = pd.DataFrame(columns=['date', 'mean', 'stdev', 'var'])
