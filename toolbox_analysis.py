@@ -1,6 +1,8 @@
 import traceback
 
 import sys
+import os
+import json
 import datetime
 from loguru import logger
 import pandas as pd
@@ -52,7 +54,6 @@ def plot_graphs(recipes, folder, format, dpi, scenario_name='test_1'):
 
     # Plotting parameters
     store = pd.HDFStore(benchmark_sim.get_store_filename(scenario_name, ''))
-    print('')
 
     for param in parameters:
         plot_and_save(store, param['parameter'], param['title'], param['keys'], xlabel='simulation time',
@@ -129,8 +130,8 @@ def do_oat_analysis(results, variation_params, target_metric, folder_figures, sc
         results_df = results_df.append({'factor': factor, 'value': min}, ignore_index=True)
         results_df = results_df.append({'factor': factor, 'value': mean}, ignore_index=True)
         results_df = results_df.append({'factor': factor, 'value': max}, ignore_index=True)
-        logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with min {(min / mean * 100):.2f}%')
-        logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with max {(max / mean * 100):.2f}%')
+        # logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with min {(min / mean * 100):.2f}%')
+        # logger.info(f'Target metric: {target_metric} - Factor: {factor} - changed with max {(max / mean * 100):.2f}%')
         variances_df = variances_df.append({'factor': factor, 'variance': statistics.variance([min, mean, max])},
                                            ignore_index=True)
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -144,7 +145,7 @@ def do_oat_analysis(results, variation_params, target_metric, folder_figures, sc
                 format=format,
                 bbox_inches="tight")
     results_df.to_csv(f'{folder_figures}\\{scenario_name}_{target_metric}.csv')
-    logger.info(variances_df.sort_values(by=['variance']).to_markdown())
+    # logger.info(variances_df.sort_values(by=['variance']).to_markdown())
 
     return variances_df
 
@@ -169,9 +170,6 @@ def do_sobol_analysis(results, variation_params, target_metric, folder_figures, 
     exog = results[[param1, param2]]
     # Get the self consumption index as response for each treatment
     endog = results[[target_metric]]
-
-    #logger.info(results.to_markdown())
-    print(results.to_markdown())
 
     # We want to fit a metamodel to our system
     # We chose Kriging (Gaussian Process) this time around. You can also choose other metamodels if you want
@@ -219,17 +217,28 @@ def do_sobol_analysis(results, variation_params, target_metric, folder_figures, 
         plt.show()
 
 
-def analyze_results(recipes, variations_dict, basic_conf, folder='figures', format='png', dpi=300, doe_type='anova',
-                    plots=True, target_metrics=[], folder_figures='figures', scenario_name='test_1', plt_show=False):
-    print('')
+def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='png', dpi=300, doe_type='anova',
+                    plots=True, target_metrics=[], folder_figures='figures', plt_show=False, results_file=None):
+    if not folder:
+        folder = basic_conf['folder_temp_files']
+    scenario_name = basic_conf['scenario_name']
+    logger.info(f'Start analysis script for scenario {scenario_name}')
     if plots:
-        plot_graphs(recipes, folder, format, dpi)
+        plot_graphs(recipes, folder_figures, format, dpi)
 
-    # Store results and get response summaries
-    run_store = pd.HDFStore(f'{basic_conf["folder_temp_files"]}\\{basic_conf["summary_filename"]}.h5')
-    results = [run_store[k] for k in run_store.keys()]
-    run_store.close()
-    results = pd.concat(results, axis=0).set_index('ID')
+    if not results_file:
+        results_file = os.path.join(folder, f'{basic_conf["summary_filename"]}.h5')
+        logger.info(f'No results file was specified. Using filename from simulation parameter file: {results_file}')
+    if results_file.endswith('json'):
+        logger.info(f'Results are read in from the JSON file {results_file}')
+        with open(results_file) as data: 
+            results = pd.DataFrame(json.load(data))
+    if results_file.endswith('h5') or results_file.endswith('hdf5'):
+        logger.info(f'Results are read in from the HDF5 file {results_file}')
+        run_store = pd.HDFStore(results_file)
+        results = [run_store[k] for k in run_store.keys()]
+        run_store.close()
+        results = pd.concat(results, axis=0).set_index('ID')
 
     # for analysis min and max values are needed
     variation_params = {}
@@ -322,7 +331,7 @@ def analyze_results(recipes, variations_dict, basic_conf, folder='figures', form
                                       print_to_console=False)
                 si_filter = {k: si[k] for k in ["ST", "ST_conf", "S1", "S1_conf"]}
                 si_df = pd.DataFrame(si_filter, index=problem["names"])
-                si_df.to_csv(f'{folder}/{scenario_name}_si_analysis_{target_metric}.csv')
+                si_df.to_csv(f'{folder_figures}/{scenario_name}_si_analysis_{target_metric}.csv')
                 # pandas.concat([si_results, pd.DataFrame(si_filter, index=problem["names"])])
 
                 fig, ax = plt.subplots(1)
@@ -335,8 +344,8 @@ def analyze_results(recipes, variations_dict, basic_conf, folder='figures', form
                 ax.set_xlabel('Parameter')
                 plt.title(target_metric)
                 fig.set_size_inches(8, 4)
-                # plt.savefig(f'{folder}/{scenario_name}_si_analysis_2_{target_metric}.{format}', dpi=dpi, format=format)
-                fig.savefig(f'{folder}/{scenario_name}_si_analysis_{target_metric}.{format}', dpi=dpi, format=format)
+                # plt.savefig(f'{folder_figures}/{scenario_name}_si_analysis_2_{target_metric}.{format}', dpi=dpi, format=format)
+                fig.savefig(f'{folder_figures}/{scenario_name}_si_analysis_{target_metric}.{format}', dpi=dpi, format=format)
             except Exception as e:
                 logger.info(f'Exception for target metric: {target_metric}: {e}')
                 traceback.print_exception(*sys.exc_info())
@@ -344,3 +353,41 @@ def analyze_results(recipes, variations_dict, basic_conf, folder='figures', form
         # si_results.to_csv('si_analysis.csv')
     else:
         logger.info('No analysis type defined, which is matching with the available types.')
+
+
+if __name__ == "__main__":
+    import argparse
+
+    # Parse command line options.
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--folder', default = os.path.join('output','temp_files_tank_scaling_heat'), help = 'folder with configuration files')
+    parser.add_argument('--results', default = 'runs_summary.h5', help = 'file with values of target metrics for simulation runs')
+    args = parser.parse_args()
+
+    # Read configuration files from temp folder to make them available for analysis
+    temp_folder = args.folder
+    results = args.results
+    results_file = os.path.join(temp_folder, results)
+    with open(os.path.join(temp_folder, 'recipes.json')) as data: 
+        recipes = json.load(data)
+    with open(os.path.join(temp_folder, 'variations_dict.json')) as data: 
+        variations_dict = json.load(data)
+    with open(os.path.join(temp_folder, 'basic_conf.json')) as data: 
+        basic_conf = json.load(data)
+    with open(os.path.join(temp_folder, 'target_metrics.json')) as data: 
+        target_metrics = json.load(data)
+    with open(os.path.join(temp_folder, 'sim_parameters.json')) as data: 
+        sim_parameters = json.load(data)
+
+    analyze_results(recipes=recipes,
+                    variations_dict=variations_dict,
+                    basic_conf=basic_conf,
+                    folder=temp_folder,
+                    format=sim_parameters['format'],
+                    dpi=sim_parameters['dpi'],
+                    doe_type=sim_parameters['doe_type'],
+                    plots=sim_parameters['plots'],
+                    target_metrics=target_metrics,
+                    plt_show=sim_parameters['show_plots'],
+                    folder_figures=sim_parameters['folder_figures'],
+                    results_file=results_file)
