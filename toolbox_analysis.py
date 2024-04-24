@@ -89,8 +89,8 @@ def do_f_test(param1, param2, target_metric, results):
 def do_anova_analysis(results, variation_params, target_metric):
     import itertools
 
-    param1 = list(variation_params.keys())[0]
-    param2 = list(variation_params.keys())[1]
+    # param1 = list(variation_params.keys())[0]
+    # param2 = list(variation_params.keys())[1]
 
     for param1, param2 in itertools.product(variation_params.keys(), variation_params.keys()):
         if param1 != param2:

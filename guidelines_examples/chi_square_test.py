@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import chisquare, fisher_exact, power_divergence, chi2_contingency
 from loguru import logger
 from scipy.stats import expon, chi2
-import seaborn
+#import seaborn
 
 # logger.info(chisquare([16, 18, 16, 14, 12, 12]))
 
@@ -46,26 +46,29 @@ distr_series = pd.Series(normal_distr_samples)
 t2 = pd.DataFrame({'index':distr_series.index, 'values':distr_series.values, 'group': 'distr'})
 df_plotting = pd.concat([t1, t2])
 
-seaborn.boxplot(data=df_plotting, x='group', y='values')
+#seaborn.boxplot(data=df_plotting, x='group', y='values')
 plt.title("Boxplot")
 plt.show()
 
-seaborn.histplot(data=df_plotting, x='values', hue='group', bins=50)
+#seaborn.histplot(data=df_plotting, x='values', hue='group', bins=50)
+df_plotting.hist(bins=50)
 plt.title("Histogram")
 plt.show()
 
-seaborn.histplot(data=df_plotting, x='values', hue='group', bins=50, stat='density', common_norm=False)
-plt.title("Density Histogram")
-plt.show()
+#seaborn.histplot(data=df_plotting, x='values', hue='group', bins=50, stat='density', common_norm=False)
+#df_plotting.hist(bins=50)
+#plt.title("Density Histogram")
+#plt.show()
 
-seaborn.kdeplot(x='values', data=df_plotting, hue='group', common_norm=False)
-plt.title("Kernel Density Function")
-plt.show()
+#seaborn.kdeplot(x='values', data=df_plotting, hue='group', common_norm=False)
+#plt.title("Kernel Density Function")
+#plt.show()
 
-seaborn.histplot(x='values', data=df_plotting, hue='group', bins=len(df_plotting), stat="density",
-             element="step", fill=False, cumulative=True, common_norm=False)
-plt.title("Cumulative distribution function")
-plt.show()
+df_plotting.hist(bins=len(df_plotting))
+#seaborn.histplot(x='values', data=df_plotting, hue='group', bins=len(df_plotting), stat="density",
+ #            element="step", fill=False, cumulative=True, common_norm=False)
+#plt.title("Cumulative distribution function")
+#plt.show()
 
 logger.info(f"\n{df_bins.to_markdown()}")
 
