@@ -320,48 +320,4 @@ if __name__ == '__main__':
     logger.info(f"number of planned simulation runs: {len(recipes)}")
 
 
-'''
-    if sim_parameters['parallelize']:
-        if sim_parameters['skip_simulation']:
-            logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
-                        "and only analysis script executed.")
-        else:
-            logger.info('Start parallel execution of scenarios')
-            pool = mp.Pool(processes=sim_parameters['num_processes'])
-            pool.map(benchmark_sim.run_scenario, list(recipes.values()))
-        for recipe_name in recipes:
-            logger.info(f'Data processing scenario with recipe {recipe_name}: {recipes[recipe_name]}')
-            benchmark_analysis.data_processing(recipes[recipe_name],
-                                               variations,
-                                               folder_temp_files,
-                                               basic_conf['summary_filename'],
-                                               sim_parameters['drop_first_day_data'])
-
-    else:
-        for recipe_name in recipes:
-            if sim_parameters['skip_simulation']:
-                logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
-                            "and only analysis script executed.")
-            else:
-                logger.info(f'Run scenario with recipe {recipe_name}: {recipes[recipe_name]}')
-                benchmark_sim.run_scenario(recipes[recipe_name])
-            benchmark_analysis.data_processing(recipes[recipe_name],
-                                               variations,
-                                               folder_temp_files,
-                                               basic_conf['summary_filename'],
-                                               sim_parameters['drop_first_day_data'])
-
-    toolbox_analysis.analyze_results(recipes=recipes,
-                                       variations_dict=variations_dict,
-                                       basic_conf=basic_conf,
-                                       folder=sim_parameters['folder_figures'],
-                                       format=sim_parameters['format'],
-                                       dpi=sim_parameters['dpi'],
-                                       doe_type=sim_parameters['doe_type'],
-                                       plots=sim_parameters['plots'],
-                                       target_metrics=target_metrics,
-                                       folder_figures=sim_parameters['folder_figures'],
-                                       scenario_name=basic_conf['scenario_name'],
-                                       plt_show=sim_parameters['show_plots'])
-    # benchmark_analysis.plot_simulation_results(sim_parameters)
-'''
+    logger.info(f'Toolbox finished running. The recipes in {basic_conf["folder_temp_files"]}\recipes.json can now be used for your simulation/experiment.')

@@ -57,7 +57,7 @@ def get_variations_distribution(variations_dict):
                 means.append(factor_value['mean'])
                 stdvs.append(factor_value['stdvs'])
             else:
-                logger.warning(f'Please specifiy mean and stdvs for {entity} - {factor}')
+                logger.warning(f'Please specify mean and stdvs for {entity} - {factor}')
     return means, stdvs
 
 
@@ -181,9 +181,11 @@ if __name__ == '__main__':
             samples = sampler.random_base2(m=int(m_log))
         else:
             # calculate the number of samples based on 2**m
-            logger.warning(f"Note: unbalanced design is requested since number of samples is not a power of 2: samples requested:{sim_parameters['samples']} {2**m_log}, samples used {2**(int(m_log) + 1)};  missing samples: {2**(int(m_log) + 1) - sim_parameters['samples']}")
+            logger.warning(f"Note: unbalanced design requested since number of samples is not a power of 2: \n"
+                           f"samples requested:{sim_parameters['samples']} {2**m_log}, samples used \
+                            {2**(int(m_log) + 1)};  missing samples: {2**(int(m_log) + 1) - sim_parameters['samples']}")
             samples = sampler.random_base2(m=int(m_log)+1)
-            samples = sobol_seq.i4_sobol_generate(num_factors, sim_parameters['samples'])
+            # samples = sobol_seq.i4_sobol_generate(num_factors, sim_parameters['samples'])
 
         if sim_parameters['add_extreme_points']:
             # SOBOL index includes 0 extreme point, so only add "1"
