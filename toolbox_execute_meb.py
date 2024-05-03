@@ -28,19 +28,18 @@ if __name__ == "__main__":
         target_metrics = json.load(data)
     with open(os.path.join(temp_folder, 'sim_parameters.json')) as data: 
         sim_parameters = json.load(data)
-
-    logger.info('')
-    # logger.info(f'Start simulation with simulation time of {end} seconds')
-    logger.info("Start simulation")
-    logger.info(f"DoE type: {sim_parameters['doe_type']}")
-    logger.info(f"basic_conf: {basic_conf}")
-    # logger.info(f"variations_dict: {variations_dict}")
-    logger.info(f"number of planned simulation runs: {len(recipes)}")
     
     if sim_parameters['skip_simulation']:
         logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
                     "and only analysis script executed.")
     else:
+
+        # logger.info(f'Start simulation with simulation time of {end} seconds')
+        logger.info("Start simulation")
+        logger.info(f"DoE type: {sim_parameters['doe_type']}")
+        logger.info(f"basic_conf: {basic_conf}")
+        # logger.info(f"variations_dict: {variations_dict}")
+        logger.info(f"number of planned simulation runs: {len(recipes)}")
         if sim_parameters['parallelize']:
             logger.info(f"Start parallel execution of scenarios in {sim_parameters['num_processes']} processes")
             pool = mp.Pool(processes=sim_parameters['num_processes'])
