@@ -233,6 +233,9 @@ def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='p
         logger.info(f'Results are read in from the JSON file {results_file}')
         with open(results_file) as data: 
             results = pd.DataFrame(json.load(data))
+    if results_file.endswith('csv'):
+        logger.info(f'Results are read in from the CSV file {results_file}')
+        results = pd.read_csv(results_file)
     if results_file.endswith('h5') or results_file.endswith('hdf5'):
         logger.info(f'Results are read in from the HDF5 file {results_file}')
         run_store = pd.HDFStore(results_file)

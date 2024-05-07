@@ -342,4 +342,4 @@ if __name__ == '__main__':
         data.write(json.dumps(sim_parameters, indent="    "))
 
 
-    logger.info(f'Toolbox finished running. The recipes in {basic_conf["folder_temp_files"]}\recipes.json can now be used for your simulation/experiment.')
+    logger.info(f'Toolbox finished running. The recipes in {basic_conf["folder_temp_files"]}\\recipes.json can now be used for your simulation/experiment.')

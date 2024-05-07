@@ -1,7 +1,7 @@
 {
     "samples": 32,
-    "add_extreme_points": true,
-    "doe_type": "sobol",
+    "add_extreme_points": false,
+    "doe_type": "extreme_points",
     "doe_type_alternatives": [
       "distribution_and_discrete",
       "LHS",
@@ -62,12 +62,11 @@
          "RT_Efficiency_vrb"
     ],
     "variations_dict": {
-        "Framework": {
-            "power_scaling_factor": [0.5,1.5]
-        },
         "Controller":{
-            "p_sc_max": [0.0,15.0],
-            "restoration_factor": [2,4]
+            "a_SC": [0.10,0.45],
+            "a_Li": [0.10,0.45],
+            "restoration_factor": [2,4],
+            "VRB_min_cap_fraction": [0.3,0.7]
         }
     },
     "variations_dict_alternatives": {
@@ -80,25 +79,13 @@
     },
     "entities_parameters":{
         "Framework": {
-            "power_scaling_factor": 1.0
+            "power_scaling_factor": 0.5
         },
         "Controller":{
             "VRB_min_cap_fraction": 0.5,
-             "restoration_factor": 2,
-            "p_vrb_max":7.5,
-            "p_sc_max": 7.5,
-            "p_li_max": 7.5
-        },
-        "Vanadium_Battery":{
-            "Actual_Capacity": 150,
-            "Available_Capacity": 30,
-            "Actual_Power": 48,
-            "Available_Power": 15,
-            "Initial_SOC": 50,
-            "Maximum_SOC": 95,
-            "Minimum_SOC": 5,
-            "Simulated": true,
-            "Implementation": "simulators.VanadiumBattery"
+             "restoration_factor": 3,
+            "a_SC": 0.275,
+            "a_Li": 0.275
         }
     }
 }
