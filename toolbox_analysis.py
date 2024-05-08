@@ -62,60 +62,55 @@ def plot_graphs(recipes, folder, format, dpi, scenario_name='test_1'):
     store.close()
 
 
-def do_f_test(param1, param2, target_metric, results):
-    relevant_results = results[[param1, param2, target_metric]]
-
-    values_param1 = results.groupby(param1).first().index.values.tolist()  # get the variations of param 1
-    values_param2 = results.groupby(param2).first().index.values.tolist()  # get the variations of param 2
-
-    param1_option1 = list(results[(results[param1] == values_param1[0])][target_metric])
-    param1_option2 = list(results[(results[param1] == values_param1[1])][target_metric])
-    param2_option1 = list(results[(results[param2] == values_param2[0])][target_metric])
-    param2_option2 = list(results[(results[param2] == values_param2[1])][target_metric])
-
-    value_list_param2 = []
-    for value_param2 in values_param2:
-        value_list_param2.append(relevant_results[(relevant_results[param2] == value_param2)])
-
+def do_anova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format):
+    logger.info('Do ANOVA analysis')
+    import itertools
     from scipy import stats
 
-    Fa, pa = stats.f_oneway(param1_option1, param1_option2)
-    Fb, pb = stats.f_oneway(param2_option1, param2_option2)
-    Fab, pab = stats.f_oneway([results.iloc[0][target_metric], results.iloc[3][target_metric]],
-                              [results.iloc[1][target_metric], results.iloc[2][target_metric]])
+    anova_results = pd.DataFrame(columns=['factor', 'target_metric', 'F', 'p'])
 
-    return Fa, Fb, Fab, pa, pb, pab
+    for target_metric in target_metrics:
+        for factor in variation_params.keys():
+            factor_values = results.groupby(factor).first().index.values.tolist()  
+            factor_min = min(factor_values)
+            factor_max = max(factor_values)
+            factor_min_results = list(results[(results[factor] == factor_min)][target_metric])  
+            factor_max_results = list(results[(results[factor] == factor_max)][target_metric]) 
+            F, p = stats.f_oneway(factor_min_results, factor_max_results)
 
+            anova_results.loc[len(anova_results.index)] = [factor, target_metric, F, p]
+        if plots:
+            fig = plt.figure(figsize = (10, 5))  
+            data = anova_results[anova_results['target_metric'] == target_metric]          
+            # creating the bar plot
+            plt.bar(data['factor'], data['p'], color ='maroon', width = 0.4)
+            plt.axhline(y=0.05, color='r', linestyle='-')
+            plt.xlabel("Factors analysed")
+            plt.ylabel("p-Value")
+            plt.title(f"ANOVA for {target_metric}")
+            plt.savefig(f'{folder_figures}/ANOVA_{target_metric}.{format}', dpi=dpi, format=format)
+            if plt_show:
+                plt.show()
+    
+    logger.info(f' (p < 0.05: Hypothesis 0 (same variance) is rejected -> different variances in sample -> '
+                f'change in parameter has effect.)\n{anova_results.to_markdown()}')
+    
 
-def do_anova_analysis(results, variation_params, target_metric):
-    import itertools
+def do_manova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format):
+    logger.info('Do MANOVA analysis')
+    from statsmodels.multivariate.manova import MANOVA
 
-    param1 = list(variation_params.keys())[0]
-    param2 = list(variation_params.keys())[1]
-
-    for param1, param2 in itertools.product(variation_params.keys(), variation_params.keys()):
-        if param1 != param2:
-            Fa, Fb, Fab, pa, pb, pab = do_f_test(param1=param1,
-                                                 param2=param2,
-                                                 target_metric=target_metric,
-                                                 results=results)
-
-            # Write results to file
-            logger.info(results.to_markdown())
-            # logger.info('HP Power: ' + str(sci1) + ', ' + str(sci2) + ', ' + str(sci3) + ', ' + str(sci4))
-            logger.info(f'f_oneway test hypothesis a: {param1} - hypothesis b: {param2} - Target metric: {target_metric}')
-            logger.info('computed F statistic of the test: Fa: ' + str(Fa) + ', Fb: ' + str(Fb) + ', Fab: ' + str(Fab))
-            logger.info(
-                'associated p-value from the F distribution: pa: ' + str(pa) + ', pb: ' + str(pb) + ', pab: ' + str(pab))
-            logger.info(' (p < 0.05: Hypothesis 0 (same variance) is rejected -> different variances in sample -> '
-                  'change in parameter has effect.)')
-
-            # Plot results
-            # plt.plot([1, 2], [(sci1 + sci3) / 2, (sci2 + sci4) / 2], 'b-', label="Effect of size of hot water tank")
-            # plt.plot([1, 2], [(sci1 + sci2) / 2, (sci3 + sci4) / 2], 'r-', label="Effect of controller deadband")
-            # plt.legend()
-            # plt.savefig(f'{folder}/{scenario_name}_analysis_of_effect.{format}', dpi=dpi, format=format)
-            # plt.show()
+    target_metric_observations = results[target_metrics]
+    factor_values = results[variation_params.keys()]
+    manova = MANOVA(endog=target_metric_observations, exog=factor_values)
+    manova_result = manova.mv_test()
+    # print(manova_result.summary()) 
+    # print(manova_result) 
+    factors_list = list(variation_params.keys())
+    for i, key in enumerate(manova_result.results.keys()):
+        factor = factors_list[i]
+        factor_result = manova_result[key]['stat']
+        logger.info(f'MANOVA statistic for factor {factor}: \n {factor_result}')
 
 
 def do_oat_analysis(results, variation_params, target_metric, folder_figures, scenario_name='test_1',
@@ -220,11 +215,11 @@ def do_sobol_analysis(results, variation_params, target_metric, folder_figures, 
 def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='png', dpi=300, doe_type='anova',
                     plots=True, target_metrics=[], folder_figures='figures', plt_show=False, results_file=None):
     if not folder:
-        folder = basic_conf['folder_temp_files']
+        folder = basic_conf['folder_temp_files_ANOVA']
     scenario_name = basic_conf['scenario_name']
     logger.info(f'Start analysis script for scenario {scenario_name}')
-    if plots:
-        plot_graphs(recipes, folder_figures, format, dpi)
+    # if plots:
+    #    plot_graphs(recipes, folder_figures, format, dpi)
 
     if not results_file:
         results_file = os.path.join(folder, f'{basic_conf["summary_filename"]}.h5')
@@ -233,12 +228,15 @@ def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='p
         logger.info(f'Results are read in from the JSON file {results_file}')
         with open(results_file) as data: 
             results = pd.DataFrame(json.load(data))
-    if results_file.endswith('h5') or results_file.endswith('hdf5'):
+    elif results_file.endswith('h5') or results_file.endswith('hdf5'):
         logger.info(f'Results are read in from the HDF5 file {results_file}')
         run_store = pd.HDFStore(results_file)
         results = [run_store[k] for k in run_store.keys()]
         run_store.close()
         results = pd.concat(results, axis=0).set_index('ID')
+    elif results_file.endswith('csv'):
+        logger.info(f'Results are read in from the CSV file {results_file}')
+        results = pd.DataFrame(pd.read_csv(results_file))
 
     # for analysis min and max values are needed
     variation_params = {}
@@ -257,8 +255,9 @@ def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='p
             do_sobol_analysis(results, variation_params, target_metric, folder_figures,
                               scenario_name=scenario_name, dpi=dpi, format=format, plt_show=False)
     elif doe_type == 'extreme_points':
-        for target_metric in target_metrics:
-            do_anova_analysis(results, variation_params, target_metric)
+        do_anova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format)
+        if len(target_metrics) > 1:
+            do_manova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format)
     elif doe_type == 'OAT':
         variances_df = None
         ranking = {}
@@ -360,8 +359,8 @@ if __name__ == "__main__":
 
     # Parse command line options.
     parser = argparse.ArgumentParser()
-    parser.add_argument('--folder', default = os.path.join('output','temp_files_tank_scaling_heat'), help = 'folder with configuration files')
-    parser.add_argument('--results', default = 'runs_summary.h5', help = 'file with values of target metrics for simulation runs')
+    parser.add_argument('--folder', default = os.path.join('output','temp_files_ls_hs_trial'), help = 'folder with configuration files')
+    parser.add_argument('--results', default = 'results_ANOVA.csv', help = 'file with values of target metrics for simulation runs')
     args = parser.parse_args()
 
     # Read configuration files from temp folder to make them available for analysis
