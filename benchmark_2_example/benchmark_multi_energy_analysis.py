@@ -265,7 +265,7 @@ def  data_processing(recipe, variations, folder_temp_files, summary_filename, dr
                 for key2, value in recipe[key].items():
                     sim_data[f"{key}.{key2}"] = value
     # print(f"sim_data: {sim_data}")
-    sim_data_df = pd.DataFrame(sim_data)
+    sim_data_df = pd.DataFrame([sim_data])
     run_store = pd.HDFStore(f"{folder_temp_files}/{summary_filename}.h5")
     run_store['run_{}'.format(recipe['ID'])] = sim_data_df
     run_store.close()
