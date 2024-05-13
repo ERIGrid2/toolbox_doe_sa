@@ -80,17 +80,26 @@ def do_anova_analysis(results, variation_params, target_metrics, plots, plt_show
             anova_results.add({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p})
             anova_results = anova_results._append({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p},
                                                     ignore_index=True)
+            anova_results.loc[len(anova_results.index)] = [factor, target_metric, F, p]
+        if plots:
+            fig = plt.figure(figsize = (10, 5))
+            data = anova_results[anova_results['target_metric'] == target_metric]
+            # creating the bar plot
+            plt.bar(data['factor'], data['p'], color ='maroon', width = 0.4)
+            plt.axhline(y=0.05, color='r', linestyle='-')
+            plt.xlabel("Factors analysed")
+            plt.ylabel("p-Value")
+            plt.title(f"ANOVA for {target_metric}")
+            plt.savefig(f'{folder_figures}/ANOVA_{target_metric}.{format}', dpi=dpi, format=format)
+            if plt_show:
+                plt.show()
 
-    anova_results.head()
+    logger.info(f' (p < 0.05: Hypothesis 0 (same variance) is rejected -> different variances in sample -> '
+                f'change in parameter has effect.)\n{anova_results.to_markdown()}')
+
     anova_results.to_latex(f'{folder_figures}\\anova_results.tex')
     return anova_results
 
-
-#def do_anova_analysis(results, variation_params, target_metric):
-#    import itertools
-#
-#    param1 = list(variation_params.keys())[0]
-#    param2 = list(variation_params.keys())[1]
 
 def do_manova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format):
     logger.info('Do MANOVA analysis')
