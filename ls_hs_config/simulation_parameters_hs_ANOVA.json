@@ -14,7 +14,7 @@
     "num_processes": 8,
     "skip_simulation": true,
     "drop_first_day_data": false,
-    "plots": false,
+    "plots": true,
     "show_plots": false,
     "dpi": 300,
     "format": "png",

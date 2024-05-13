@@ -77,13 +77,20 @@ def do_anova_analysis(results, variation_params, target_metrics, plots, plt_show
             factor_min_results = list(results[(results[factor] == factor_min)][target_metric])
             factor_max_results = list(results[(results[factor] == factor_max)][target_metric])
             F, p = stats.f_oneway(factor_min_results, factor_max_results)
+            anova_results.add({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p})
+            anova_results = anova_results._append({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p},
+                                                    ignore_index=True)
+
+    anova_results.head()
+    anova_results.to_latex(f'{folder_figures}\\anova_results.tex')
+    return anova_results
 
 
-def do_anova_analysis(results, variation_params, target_metric):
-    import itertools
-
-    param1 = list(variation_params.keys())[0]
-    param2 = list(variation_params.keys())[1]
+#def do_anova_analysis(results, variation_params, target_metric):
+#    import itertools
+#
+#    param1 = list(variation_params.keys())[0]
+#    param2 = list(variation_params.keys())[1]
 
 def do_manova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format):
     logger.info('Do MANOVA analysis')
@@ -100,7 +107,6 @@ def do_manova_analysis(results, variation_params, target_metrics, plots, plt_sho
         factor = factors_list[i]
         factor_result = manova_result[key]['stat']
         logger.info(f'MANOVA statistic for factor {factor}: \n {factor_result}')
-
 
 def do_oat_analysis(results, variation_params, target_metric, folder_figures, scenario_name='test_1',
                       dpi=300, format='png', plt_show=False):
