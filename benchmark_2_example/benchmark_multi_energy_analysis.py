@@ -227,26 +227,26 @@ def data_processing(recipe, variations, folder_temp_files, summary_filename, dro
     hp_p_el_kw_setpoint_percentage = hp_p_el_kw_setpoint / hp_p_rated * 100
     hp_p_el_kw_setpoint_percentage_mean = hp_p_el_kw_setpoint_percentage.mean()
 
-    sim_data = {'ID': [recipe['ID']],
+    sim_data = {'ID': recipe['ID'],
                 #'grid_voltage_bus_1_max_pu': [grid_voltage_bus_1_max_pu],
-                'grid_voltage_bus_2_max_pu': [grid_voltage_bus_2_max],
-                'line_0_loading_max_perc': [line_0_loading_max],
+                'grid_voltage_bus_2_max_pu': grid_voltage_bus_2_max,
+                'line_0_loading_max_perc': line_0_loading_max,
                 #'line_1_loading_max_perc': [line_1_loading_max],
-                'hp_electr_energy_gwh': [hp_p_effective.sum() / 60 / 1000],
-                'hp_heat_energy_gwh': [hp_w_effective.sum() / 60 / 1000],
-                'hp_average_COP': [hp_average_COP],
-                'electricity_import_mwh': [electricity_import_mwh],
-                'electricity_export_mwh': [electricity_export_mwh],
+                'hp_electr_energy_gwh': hp_p_effective.sum() / 60 / 1000,
+                'hp_heat_energy_gwh': hp_w_effective.sum() / 60 / 1000,
+                'hp_average_COP': hp_average_COP,
+                'electricity_import_mwh': electricity_import_mwh,
+                'electricity_export_mwh': electricity_export_mwh,
                 #'self_consumption_mwh': [self_consumption_mwh],
-                'self_consumption_perc': [self_consumption_perc],
+                'self_consumption_perc': self_consumption_perc,
                 #'line_losses_mwh': [line_losses_pl_mw.sum() / 60],
                 #'hp_p_el_kw_setpoint_perc_mean': [hp_p_el_kw_setpoint_percentage_mean],
-                't_supply_min': [min([t_supply_1.min(), t_supply_2.min()])],
-                't_supply_max': [max([t_supply_1.max(), t_supply_2.max()])],
+                't_supply_min': min([t_supply_1.min(), t_supply_2.min()]),
+                't_supply_max': max([t_supply_1.max(), t_supply_2.max()]),
                 #'energy_sum_gwh': [sum_energy_kw_min.sum() / 60 / 1000],
-                'heat_import_gwh': [energy_ext_grid_kw_min.sum() / 60 / 1000],
-                'heat_import_perc': [energy_ext_grid_kw_min.sum() / sum_energy_kw_min.sum() / 60 / 1000],
-                'hp_perc': [hp_w_effective.sum() / sum_energy_kw_min.sum() / 60 / 1000],
+                'heat_import_gwh': energy_ext_grid_kw_min.sum() / 60 / 1000,
+                'heat_import_perc': energy_ext_grid_kw_min.sum() / sum_energy_kw_min.sum() / 60 / 1000,
+                'hp_perc': hp_w_effective.sum() / sum_energy_kw_min.sum() / 60 / 1000,
                 #'grid_voltage_bus_1_min_pu': [grid_voltage_bus_1_min_pu],
                 #'grid_voltage_bus_2_min_pu': [grid_voltage_bus_2_min],
                 #'electricity_balance_mwh': [electricity_balance_mw.sum() / 60],
@@ -255,8 +255,8 @@ def data_processing(recipe, variations, folder_temp_files, summary_filename, dro
                 #'energy_tank_supplied_kw_min_gwh': [energy_tank_supplied_kw_min.sum() / 60 / 1000],
                 #'heat_internal_percentage': [heat_internal_percentage],
                 #'self_consumption_index': [self_consumption_index],
-                'File ID/dataframe': [
-                    '{}'.format(benchmark_sim.get_store_filename(recipe)) + '/' + 'timeseries/sim_{}'.format(recipe['ID'])]}
+                'File ID/dataframe': 
+                    '{}'.format(benchmark_sim.get_store_filename(recipe)) + '/' + 'timeseries/sim_{}'.format(recipe['ID'])}
 
     # Write variation parameter to sim_data dict (needed for meta model analysis)
     for key in recipe.keys():
@@ -265,11 +265,12 @@ def data_processing(recipe, variations, folder_temp_files, summary_filename, dro
                 for key2, value in recipe[key].items():
                     sim_data[f"{key}.{key2}"] = value
     # print(f"sim_data: {sim_data}")
-    sim_data_df = pd.DataFrame(sim_data)
-    sim_data_df.to_csv(f"{folder_temp_files}/{summary_filename}.csv")
+    sim_data_df = pd.DataFrame([sim_data])
     run_store = pd.HDFStore(f"{folder_temp_files}/{summary_filename}.h5")
     run_store['run_{}'.format(recipe['ID'])] = sim_data_df
     run_store.close()
+
+    return sim_data
 
 
 def get_sim_node_name(

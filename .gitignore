@@ -13,3 +13,5 @@ __pycache__
 /benchmark_2_example/temp_files_sobol_indices_designparams/*.h5
 /output
 /guidelines_examples/figures
+/figures
+*.log

@@ -6,7 +6,6 @@ import itertools
 import pyDOE
 import sobol_seq
 import json
-import multiprocessing as mp
 import numpy as np
 import os
 import sys
@@ -16,13 +15,9 @@ from loguru import logger
 from SALib import ProblemSpec
 from SALib.sample import sobol, fast_sampler, latin
 
-import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
-import benchmark_2_example.benchmark_multi_energy_analysis as benchmark_analysis
-import toolbox_analysis
-
 logger.remove()
-logger.add("results.log", level="DEBUG")
-logger.add(sys.stderr, level="DEBUG")
+logger.add("results.log", level="INFO")
+logger.add(sys.stderr, level="INFO")
 
 
 def check_for_folders(folder):
@@ -119,20 +114,45 @@ def create_problem(variations_dict):
 
 
 if __name__ == '__main__':
-    config_folder = 'simulation_configurations'
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain.json')
-    sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_oat.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_designparams.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_designparams_metamodel_2.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_scenarioparams_metamodel.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_scenarioparams.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_inter_domain_sobolIndices.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_demo5.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_pv.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_heat.json')
-    # sim_parameters = read_in_sim_parameters(f'{config_folder}\simulation_parameters_tank_scaling_lines.json')
+    import argparse
+
+    # Parse command line options.
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', help = 'path to configuration file')
+    args = parser.parse_args()
+
+    # Read configuration files from temp folder to make them available for analysis
+    config_file_arg = args.config
+    if config_file_arg:
+        config_file = args.config
+        if os.path.exists(config_file):
+            logger.info(f'Use configuration file {config_file}')
+        else:
+            logger.info(f'The chosen configuration file {config_file} can not be found.')
+    else:
+        logger.info(f'No configuration file chosen. Please use --config to specify your configuration file.')
+    
+        # Hard code configuration file:
+        config_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'simulation_configurations')
+        
+        # config_file = os.path.join(config_folder, 'simulation_parameters.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_oat.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_designparams.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_designparams_metamodel_2.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_scenarioparams_metamodel.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_scenarioparams.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_inter_domain_sobolIndices.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_demo5.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_tank_scaling.json')
+        config_file = os.path.join(config_folder, 'simulation_parameters_tank_scaling_heat.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_tank_scaling_lines.json')
+        # config_file = os.path.join(config_folder, 'simulation_parameters_tank_scaling_pv.json')
+        logger.info(f'Because no configuration file was specified, {config_file} is used.')
+
+    sim_parameters = read_in_sim_parameters(config_file)
+
     entities_parameters = sim_parameters['entities_parameters']
     basic_conf = sim_parameters['basic_conf']
     variations_dict = sim_parameters['variations_dict']
@@ -274,69 +294,30 @@ if __name__ == '__main__':
     # remove temp folder, as old data in it would disturb calculation
     folder_temp_files = basic_conf['folder_temp_files']
     if os.path.isdir(folder_temp_files) and not sim_parameters['skip_simulation']:
-        try:
-            shutil.rmtree(folder_temp_files)
-            logger.info(f"Removed folder {folder_temp_files} to remove old temp files.")
-        except OSError as e:
-            logger.warning(f"{e.filename} - {e.strerror}")
-        #os.remove(folder_temp_files)
+        warning_message = f"The folder for temporary files ({folder_temp_files} exists already. This might lead to problems and it is recommended to remove it. Should the folder be removed now? (y/N)"
+        var = input(warning_message)
+        if var.lower() == 'y':
+            try:
+                shutil.rmtree(folder_temp_files)
+                logger.info(f"Removed folder {folder_temp_files} to remove old temp files.")
+            except OSError as e:
+                logger.warning(f"{e.filename} - {e.strerror}")
     if not os.path.isdir(folder_temp_files):
         os.mkdir(folder_temp_files)
 
-    #store recipes to file for analysis
-    with open(f"{folder_temp_files}/recipes.json", "w") as write_file:
-        json.dump(recipes, write_file)
-    #store variations to file for analysis
-    with open(f"{folder_temp_files}/variations.json", "w") as write_file:
-        json.dump(variations, write_file)
+    # Write configuration files to temp folder to make them available for analysis
+    # TODO: This could be optimized, because some data is redundant
+    with open(os.path.join(basic_conf['folder_temp_files'], 'recipes.json'),'w') as data: 
+        data.write(json.dumps(recipes, indent="    "))
+    with open(os.path.join(basic_conf['folder_temp_files'], 'variations.json'),'w') as data: 
+        data.write(json.dumps(variations, indent="    "))
+    with open(os.path.join(basic_conf['folder_temp_files'], 'variations_dict.json'),'w') as data: 
+        data.write(json.dumps(variations_dict, indent="    "))
+    with open(os.path.join(basic_conf['folder_temp_files'], 'basic_conf.json'),'w') as data: 
+        data.write(json.dumps(basic_conf, indent="    "))
+    with open(os.path.join(basic_conf['folder_temp_files'], 'target_metrics.json'),'w') as data: 
+        data.write(json.dumps(target_metrics, indent="    "))
+    with open(os.path.join(basic_conf['folder_temp_files'], 'sim_parameters.json'),'w') as data: 
+        data.write(json.dumps(sim_parameters, indent="    "))
 
-    logger.info('')
-    # logger.info(f'Start simulation with simulation time of {end} seconds')
-    logger.info("Start simulation")
-    logger.info(f"DoE type: {sim_parameters['doe_type']}")
-    logger.info(f"basic_conf: {basic_conf}")
-    # logger.info(f"variations_dict: {variations_dict}")
-    logger.info(f"number of planned simulation runs: {len(recipes)}")
-
-    if sim_parameters['parallelize']:
-        if sim_parameters['skip_simulation']:
-            logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
-                        "and only analysis script executed.")
-        else:
-            logger.info('Start parallel execution of scenarios')
-            pool = mp.Pool(processes=sim_parameters['num_processes'])
-            pool.map(benchmark_sim.run_scenario, list(recipes.values()))
-        for recipe_name in recipes:
-            logger.info(f'Data processing scenario with recipe {recipe_name}: {recipes[recipe_name]}')
-            benchmark_analysis.data_processing(recipes[recipe_name],
-                                               variations,
-                                               folder_temp_files,
-                                               basic_conf['summary_filename'],
-                                               sim_parameters['drop_first_day_data'])
-    else:
-        for recipe_name in recipes:
-            if sim_parameters['skip_simulation']:
-                logger.info("Execution of simulation is skipped due to 'skip_simulation' parameter in configuration"
-                            "and only analysis script executed.")
-            else:
-                logger.info(f'Run scenario with recipe {recipe_name}: {recipes[recipe_name]}')
-                benchmark_sim.run_scenario(recipes[recipe_name])
-            benchmark_analysis.data_processing(recipes[recipe_name],
-                                               variations,
-                                               folder_temp_files,
-                                               basic_conf['summary_filename'],
-                                               sim_parameters['drop_first_day_data'])
-
-    toolbox_analysis.analyze_results(recipes=recipes,
-                                       variations_dict=variations_dict,
-                                       basic_conf=basic_conf,
-                                       folder=sim_parameters['folder_figures'],
-                                       format=sim_parameters['format'],
-                                       dpi=sim_parameters['dpi'],
-                                       doe_type=sim_parameters['doe_type'],
-                                       plots=sim_parameters['plots'],
-                                       target_metrics=target_metrics,
-                                       folder_figures=sim_parameters['folder_figures'],
-                                       scenario_name=basic_conf['scenario_name'],
-                                       plt_show=sim_parameters['show_plots'])
-    # benchmark_analysis.plot_simulation_results(sim_parameters)
+    logger.info(f'Toolbox finished running. The recipes in {basic_conf["folder_temp_files"]}\recipes.json can now be used for your simulation/experiment.')
