@@ -14,8 +14,10 @@ from SALib.analyze import sobol, fast
 from pandas import DataFrame
 
 # import benchmark_2_example.benchmark_multi_energy_sim as benchmark_sim
-import toolbox_start as benchmark_sa
+import toolbox_start
 
+## GLOBAL PARAMETERS
+SUPRESS_ENTITY_NAME = True
 
 logger.remove()
 logger.add("results.log", level="DEBUG")
@@ -77,32 +79,47 @@ def do_anova_analysis(results, variation_params, target_metrics, plots, plt_show
             factor_min_results = list(results[(results[factor] == factor_min)][target_metric])
             factor_max_results = list(results[(results[factor] == factor_max)][target_metric])
             F, p = stats.f_oneway(factor_min_results, factor_max_results)
-            anova_results.add({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p})
-            anova_results = anova_results._append({'factor': factor, 'target_metric': target_metric, 'F': F, 'p': p},
-                                                    ignore_index=True)
             anova_results.loc[len(anova_results.index)] = [factor, target_metric, F, p]
         if plots:
             fig = plt.figure(figsize = (10, 5))
+            ax = fig.add_subplot(111)
+            ax2 = ax.twinx()
             data = anova_results[anova_results['target_metric'] == target_metric]
+            x = np.arange(len(data))  # the label locations
+            width = 0.35
             # creating the bar plot
-            plt.bar(data['factor'], data['p'], color ='maroon', width = 0.4)
-            plt.axhline(y=0.05, color='r', linestyle='-')
-            plt.xlabel("Factors analysed")
-            plt.ylabel("p-Value")
+            #plt.bar(data['factor'], data['p'], color ='maroon', width = 0.2)
+            #plt.bar(data['factor'], data['F'], color ='blue', width = 0.2)
+            data.plot(kind='bar', y='p',  color='maroon', width=width, rot=0, ax=ax, position=0)
+            data.plot(kind='bar', y='F',  color='blue', width=width, rot=0, ax=ax2, position=1)
+            ax.axhline(y=0.05, color='r', linestyle='-')
+            ax.set_ylabel('p-Value')
+            ax2.set_ylabel('F-Value')
+            ax.set_xticks(x + width, data['factor'].apply(lambda x: x.split('.')[1]))
+            ax.set_xlabel("Factors analysed")
+            # plt.ylabel("p-Value")
+            # plt.secondary_yaxis('F')
+            fig.legend(['p=0.05','p-Value','F-Value'], loc='upper right')
+            plt.title(f"ANOVA for {target_metric}")
+            plt.savefig(f'{folder_figures}/ANOVA_{target_metric}.{format}', dpi=dpi, format=format)
+
+            ax.axhline(y=0.05, color='r', linestyle='-')
+            # plt.xlabel("Factors analysed")
+            # plt.ylabel("p-Value")
             plt.title(f"ANOVA for {target_metric}")
             plt.savefig(f'{folder_figures}/ANOVA_{target_metric}.{format}', dpi=dpi, format=format)
             if plt_show:
                 plt.show()
 
     logger.info(f' (p < 0.05: Hypothesis 0 (same variance) is rejected -> different variances in sample -> '
-                f'change in parameter has effect.)\n{anova_results.to_markdown()}')
+                f'change in parameter has significant effect.)\n{anova_results.to_markdown()}')
 
     anova_results.to_latex(f'{folder_figures}\\anova_results.tex')
     return anova_results
 
 
 def do_manova_analysis(results, variation_params, target_metrics, plots, plt_show, folder_figures, dpi, format):
-    logger.info('Do MANOVA analysis')
+    logger.info('Do MANOVA analysis - testing for joint effect of factor on several target metrics')
     from statsmodels.multivariate.manova import MANOVA
 
     target_metric_observations = results[target_metrics]
@@ -163,6 +180,7 @@ def do_sobol_analysis(results, variation_params, target_metric, folder_figures, 
         all.plot(ax=ax, x=param, y=target_metric)
         plt.savefig(f'{folder_figures}/{scenario_name}_sobol_1_factor_{target_metric}.{format}', dpi=dpi, format=format)
         return
+    ##### HARD-CODED SELECTION OF FACTORS FOR META-MODEL
     param1 = list(variation_params.keys())[0]
     param2 = list(variation_params.keys())[1]
     # Get the used treatments (battery size and power)
@@ -246,13 +264,23 @@ def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='p
     variation_params = {}
     for entity, params in variations_dict.items():
         for param, variation in params.items():
-            variation_params[f'{entity}.{param}'] = {}
-            if isinstance(variation, dict):
-                variation_params[f'{entity}.{param}']['min'] = variation['mean'] - variation['stdvs'] * 3
-                variation_params[f'{entity}.{param}']['max'] = variation['mean'] + variation['stdvs'] * 3
+            if SUPRESS_ENTITY_NAME:
+                variation_params[param] = {}
+                if isinstance(variation, dict):
+                    variation_params[param]['min'] = variation['mean'] - variation['stdvs'] * 3
+                    variation_params[param]['max'] = variation['mean'] + variation['stdvs'] * 3
+                else:
+                    variation_params[param]['min'] = variation[0]
+                    variation_params[param]['max'] = variation[1]
+
             else:
-                variation_params[f'{entity}.{param}']['min'] = variation[0]
-                variation_params[f'{entity}.{param}']['max'] = variation[1]
+                variation_params[f'{entity}.{param}'] = {}
+                if isinstance(variation, dict):
+                    variation_params[f'{entity}.{param}']['min'] = variation['mean'] - variation['stdvs'] * 3
+                    variation_params[f'{entity}.{param}']['max'] = variation['mean'] + variation['stdvs'] * 3
+                else:
+                    variation_params[f'{entity}.{param}']['min'] = variation[0]
+                    variation_params[f'{entity}.{param}']['max'] = variation[1]
 
     if doe_type == 'sobol' or doe_type == 'LHS':
         for target_metric in target_metrics:
@@ -314,7 +342,7 @@ def analyze_results(recipes, variations_dict, basic_conf, folder=None, format='p
         variance_sum.to_csv(f'{folder_figures}\\{scenario_name}_factor_ranking.csv')
 
     elif doe_type == 'sobol_indices' or doe_type == 'fast':
-        problem, discrete = benchmark_sa.create_problem(variations_dict)
+        problem, discrete = toolbox_start.create_problem(variations_dict)
         # si_results = DataFrame()
         for target_metric in target_metrics:
             logger.info(f'Do sobol indices analysis for target metric {target_metric}:')
